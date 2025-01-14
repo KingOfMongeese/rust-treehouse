@@ -30,23 +30,16 @@ fn main() {
     println!("Hello, whats your name?\n>");
     let name = get_name();
 
-    let mut is_on_list = false;
     let visitor_list = [
         Visitor::new("joe", "Coffee is ready for you"),
         Visitor::new("fred", "Dreaded Fred"),
         Visitor::new("steve", "I am peeved at steve"),
     ];
 
-    for visitor in &visitor_list {
-        if visitor.name == name {
-            is_on_list = true;
-            break;
-        }
-    }
+    let known_visitor = visitor_list.iter().find(|visitor| visitor.name == name);
 
-    if is_on_list {
-        println!("Hello {}!", name);
-    } else {
-        print!("You are not on the list");
+    match known_visitor {
+        Some(visitor) => visitor.greet_visitor(),
+        None => println!("You are not on the visitor list. Security will show you out...") 
     }
 }
