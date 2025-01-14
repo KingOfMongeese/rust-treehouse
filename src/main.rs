@@ -1,5 +1,6 @@
 use std::io::stdin;
 
+#[derive(Debug)]
 struct Visitor {
     name: String,
     greeting: String,
@@ -14,7 +15,7 @@ impl Visitor {
     }
 
     fn greet_visitor(&self) {
-        print!("{}", self.greeting);
+        println!("{}", self.greeting);
     }
 }
 
@@ -27,19 +28,42 @@ fn get_name() -> String {
 }
 
 fn main() {
-    println!("Hello, whats your name?\n>");
-    let name = get_name();
 
-    let visitor_list = [
+    let mut visitor_list = vec![
         Visitor::new("joe", "Coffee is ready for you"),
         Visitor::new("fred", "Dreaded Fred"),
         Visitor::new("steve", "I am peeved at steve"),
     ];
 
-    let known_visitor = visitor_list.iter().find(|visitor| visitor.name == name);
+    loop {
+        println!("What is your name? Enter blank to stop");
+        let name = get_name();
 
-    match known_visitor {
-        Some(visitor) => visitor.greet_visitor(),
-        None => println!("You are not on the visitor list. Security will show you out...") 
+        let known_visitor = visitor_list.iter().find(|visitor| visitor.name == name);
+
+        match known_visitor {
+            Some(visitor) => visitor.greet_visitor(),
+            None => {
+                if name.is_empty() {
+                    break;
+                } else {
+                    println!("{} is not on the list\nWould you like to be added?(y/n)", name);
+                    let mut answer = String::new();
+                    stdin().read_line(&mut answer).expect("Failed");
+
+                    if answer.to_lowercase().starts_with("y") {
+                        println!("Great a new friend! How shall I greet you?");
+                        let mut new_greeting = String::new();
+                        stdin().read_line(&mut new_greeting).expect("Failed");
+                        visitor_list.push(Visitor::new(&name, new_greeting.trim()));
+                    } else {
+                        println!("Fine I have enough friends");
+                    }
+                }
+            }
+        }
     }
+    println!("Final vector of visitors:\n{:#?}", visitor_list);
+
+
 }
