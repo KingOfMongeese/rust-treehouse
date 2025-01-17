@@ -1,16 +1,28 @@
 use std::io::stdin;
 
 #[derive(Debug)]
+enum VisitorAction {
+    Accept,
+    AcceptWithNote { note: String},
+    Refuse,
+    Probation,
+}
+
+#[derive(Debug)]
 struct Visitor {
     name: String,
     greeting: String,
+    action: VisitorAction,
+    age: i8
 }
 
 impl Visitor {
-    fn new(name: &str, greeting: &str) -> Self {
+    fn new(name: &str, greeting: &str, action: VisitorAction, age: i8) -> Self {
         Self {
             name: name.to_lowercase(),
             greeting: greeting.to_string(),
+            action,
+            age,
         }
     }
 
@@ -30,9 +42,10 @@ fn get_name() -> String {
 fn main() {
 
     let mut visitor_list = vec![
-        Visitor::new("joe", "Coffee is ready for you"),
-        Visitor::new("fred", "Dreaded Fred"),
-        Visitor::new("steve", "I am peeved at steve"),
+        Visitor::new("joe", "Coffee is ready for you", VisitorAction::Accept, 45),
+        Visitor::new("fred", "Dreaded Fred", VisitorAction::AcceptWithNote { 
+            note: String::from("Fred is dreaded, he needs a haircut") }, 15),
+        Visitor::new("steve", "I am peeved at steve", VisitorAction::Refuse, 30),
     ];
 
     loop {
@@ -52,10 +65,32 @@ fn main() {
                     stdin().read_line(&mut answer).expect("Failed");
 
                     if answer.to_lowercase().starts_with("y") {
+
+                        let mut action = VisitorAction::Accept;
+                        
+                        // get greetting
                         println!("Great a new friend! How shall I greet you?");
                         let mut new_greeting = String::new();
                         stdin().read_line(&mut new_greeting).expect("Failed");
-                        visitor_list.push(Visitor::new(&name, new_greeting.trim()));
+                        
+                        // get new note
+                        println!("Do you need a note?(y/n)");
+                        let mut needs_note = String::new();
+                        stdin().read_line(&mut needs_note).expect("Failed");
+                        if needs_note.to_lowercase().starts_with("y") {
+                            println!("Enter the note:");
+                            let mut note = String::new();
+                            stdin().read_line(&mut note).expect("Failed");
+                            action = VisitorAction::AcceptWithNote { note: String::from(note.trim()) }
+
+                        }
+
+                        // get age
+                        println!("Enter your age:");
+                        let mut age = String::new();
+                        stdin().read_line(&mut age).expect("Failed");
+
+                        visitor_list.push(Visitor::new(&name, new_greeting.trim(), action, age.trim().parse().unwrap()));
                     } else {
                         println!("Fine I have enough friends");
                     }
