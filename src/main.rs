@@ -5,7 +5,6 @@ enum VisitorAction {
     Accept,
     AcceptWithNote { note: String},
     Refuse,
-    Probation,
 }
 
 #[derive(Debug)]
@@ -27,7 +26,22 @@ impl Visitor {
     }
 
     fn greet_visitor(&self) {
-        println!("{}", self.greeting);
+       
+       match &self.action {
+        VisitorAction::Accept => println!("{}", self.greeting),
+
+        VisitorAction::AcceptWithNote { note } => {
+            println!("{}", self.greeting);
+            println!("Note: \n{}", note);
+        }
+
+        VisitorAction::Refuse => println!("You are not allowed in."),
+
+       }
+
+       if self.age < 21 {
+            println!("We cannot serve you alcohol");
+       }
     }
 }
 
@@ -97,6 +111,7 @@ fn main() {
                 }
             }
         }
+        println!("---------------------------------------------")
     }
     println!("Final vector of visitors:\n{:#?}", visitor_list);
 
